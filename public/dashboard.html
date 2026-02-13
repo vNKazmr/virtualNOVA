@@ -5,28 +5,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Next Level Discord Dashboard</title>
 <link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/jscolor@2.4.6/jscolor.min.js"></script>
 </head>
 <body>
 <header>
-    <h1>Next Level Discord Dashboard</h1>
-    <a href="/auth/discord" class="login-btn">Mit Discord verbinden</a>
+  <h1>Next Level Dashboard</h1>
+  <div id="user-info">Willkommen, <span id="username">User</span>#<span id="discriminator">0000</span></div>
 </header>
+
 <main>
-    <section class="embed-form">
-        <h2>Neuen Embed senden</h2>
-        <form id="embedForm">
-            <input type="text" name="titel" placeholder="Titel" required>
-            <textarea name="beschreibung" placeholder="Beschreibung\nmit Zeilenumbrüchen" required></textarea>
-            <input class="jscolor" name="farbe" placeholder="Farbe (Hex)" value="0099ff">
-            <input type="text" name="footer" placeholder="Footer Text">
-            <input type="text" name="bild" placeholder="Bild URL">
-            <select id="channelSelect" name="channelId" required></select>
-            <button type="submit">Embed senden</button>
-        </form>
-        <div id="embedResult"></div>
-    </section>
+  <section class="embed-section">
+    <h2>📦 Embed erstellen</h2>
+    <form id="embed-form">
+      <label>Titel:<input type="text" id="titel" required></label>
+      <label>Beschreibung:<textarea id="beschreibung" rows="4" placeholder="Nutze \\n für Zeilenumbruch"></textarea></label>
+      <label>Farbe:<input type="color" id="farbe" value="#0099ff"></label>
+      <label>Footer:<input type="text" id="footer"></label>
+      <label>Bild URL:<input type="text" id="bild"></label>
+      <label>Feld Name:<input type="text" id="feldName"></label>
+      <label>Feld Wert:<input type="text" id="feldWert"></label>
+      <label>Channel:
+        <select id="channel"></select>
+      </label>
+      <button type="submit">Embed senden</button>
+    </form>
+    <div id="embed-preview">
+      <h3>Vorschau</h3>
+      <div id="preview-box"></div>
+    </div>
+  </section>
+
+  <section class="button-section">
+    <h2>🎛 Buttons hinzufügen</h2>
+    <form id="button-form">
+      <label>Nachrichten ID:<input type="text" id="msgId" required></label>
+      <label>Label:<input type="text" id="btnLabel" required></label>
+      <label>Style:
+        <select id="btnStyle">
+          <option value="primary">Primary</option>
+          <option value="success">Success</option>
+          <option value="danger">Danger</option>
+          <option value="secondary">Secondary</option>
+        </select>
+      </label>
+      <label>Aktion Typ:
+        <select id="actionType">
+          <option value="text">Text</option>
+          <option value="role">Rolle</option>
+          <option value="editembed">Embed ändern</option>
+          <option value="command">Command</option>
+        </select>
+      </label>
+      <label>Aktion Wert:<input type="text" id="actionValue" required></label>
+      <label>Emoji:<input type="text" id="emoji"></label>
+      <label>Channel:
+        <select id="btnChannel"></select>
+      </label>
+      <button type="submit">Button hinzufügen</button>
+    </form>
+  </section>
 </main>
-<script src="dashboard.js"></script>
+
+<footer>
+  <p>Next Level Dashboard &copy; 2026</p>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
