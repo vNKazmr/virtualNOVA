@@ -1,5 +1,12 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { 
+    Client, 
+    GatewayIntentBits, 
+    EmbedBuilder, 
+    ActionRowBuilder, 
+    ButtonBuilder, 
+    ButtonStyle 
+} = require('discord.js');
 const express = require('express');
 const fs = require('fs');
 const fetch = require('node-fetch');
@@ -10,31 +17,52 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const GUILD_ID = process.env.GUILD_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-const client = new Client({ intents:[
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-]});
-client.buttonActions = {};
-const styleMap = { primary: ButtonStyle.Primary, success: ButtonStyle.Success, danger: ButtonStyle.Danger, secondary: ButtonStyle.Secondary };
-
-// Express Setup
-const app = express();
-app.use(express.json());
-app.use(express.static('public'));
-
-// Root -> Dashboard
-app.get("/", (req,res)=>{
-    res.sendFile(__dirname + "/public/dashboard.html");
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
+    ]
 });
 
-// OAuth2 Login
-app.get("/auth/discord", (req,res)=>{
+// Memory für Buttons
+client.buttonActions = {};
+const styleMap = {
+    primary: ButtonStyle.Primary,
+    success: ButtonStyle.Success,
+    danger: ButtonStyle.Danger,
+    secondary: ButtonStyle.Secondary
+};
+
+// ----------------------
+// JSON Speicher / Loader
+// ----------------------
+function loadEmbeds(){
+    if(!fs.existsSync('./embed.json')) fs.writeFileSync('./embed.json','[]');
+    return JSON.parse(fs.readFileSync('./embed.json','utf-8'));
+}
+function saveEmbeds(data){ fs.writeFileSync('./embed.json',JSON.stringify(data,null,2)); }
+
+function loadButtons(){
+    if(!fs.existsSync('./buttons.json')) fs.writeFileSync('./buttons.json','[]');
+    return JSON.parse(fs.readFileSync('./buttons.json','utf-8'));
+}
+function saveButtons(data){ fs.writeFileSync('./buttons.json',JSON.stringify(data,null,2)); }
+
+// ----------------------
+// Express Setup
+// ----------------------
+const app = express();
+app.use(express.json());
+
+// ----------------------
+// OAuth2 Routes
+// ----------------------
+app.get("/auth/discord",(req,res)=>{
     const redirectUri = encodeURIComponent(REDIRECT_URI);
     res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20guilds`);
 });
 
-// OAuth2 Callback
 app.get("/callback", async (req,res)=>{
     const code = req.query.code;
     if(!code) return res.send("Kein Code erhalten ❌");
@@ -43,10 +71,10 @@ app.get("/callback", async (req,res)=>{
         const params = new URLSearchParams();
         params.append("client_id", CLIENT_ID);
         params.append("client_secret", CLIENT_SECRET);
-        params.append("grant_type", "authorization_code");
-        params.append("code", code);
-        params.append("redirect_uri", REDIRECT_URI);
-        params.append("scope", "identify guilds");
+        params.append("grant_type","authorization_code");
+        params.append("code",code);
+        params.append("redirect_uri",REDIRECT_URI);
+        params.append("scope","identify guilds");
 
         const tokenRes = await fetch("https://discord.com/api/oauth2/token",{
             method:"POST",
@@ -57,7 +85,7 @@ app.get("/callback", async (req,res)=>{
         if(tokenData.error) return res.send("Fehler beim Token: " + tokenData.error);
 
         const userRes = await fetch("https://discord.com/api/users/@me",{
-            headers: { Authorization: `Bearer ${tokenData.access_token}` }
+            headers:{Authorization:`Bearer ${tokenData.access_token}`}
         });
         const userData = await userRes.json();
         res.send(`Hallo ${userData.username}#${userData.discriminator}, Login erfolgreich ✅`);
@@ -67,7 +95,17 @@ app.get("/callback", async (req,res)=>{
     }
 });
 
+// ----------------------
+// Dashboard Static
+// ----------------------
+app.use(express.static('public'));
+app.get("/", (req,res)=>{
+    res.sendFile(__dirname + "/public/dashboard.html");
+});
+
+// ----------------------
 // Channels Endpoint
+// ----------------------
 app.get("/channels", async (req,res)=>{
     try{
         const guild = await client.guilds.fetch(GUILD_ID);
@@ -77,7 +115,9 @@ app.get("/channels", async (req,res)=>{
     }catch(err){ res.status(500).json([]); }
 });
 
-// Embed erstellen
+// ----------------------
+// Embed Endpoint
+// ----------------------
 app.post("/embed", async (req,res)=>{
     const { titel,beschreibung,farbe,footer,bild,feldName,feldWert,channelId } = req.body;
     try{
@@ -90,6 +130,12 @@ app.post("/embed", async (req,res)=>{
         if(bild) embed.setImage(bild);
         if(feldName && feldWert) embed.addFields({name:feldName,value:feldWert});
         await channel.send({embeds:[embed]});
+
+        // Save to JSON
+        const embeds = loadEmbeds();
+        embeds.push({titel,beschreibung,farbe,footer,bild,feldName,feldWert,channelId});
+        saveEmbeds(embeds);
+
         res.send("Embed erfolgreich gesendet ✅");
     }catch(err){
         console.error(err);
@@ -97,7 +143,9 @@ app.post("/embed", async (req,res)=>{
     }
 });
 
-// Button erstellen
+// ----------------------
+// Buttons Endpoint
+// ----------------------
 app.post("/buttons", async (req,res)=>{
     const { nachrichtenid,label,style,actiontype,actionvalue,emoji } = req.body;
     try{
@@ -106,19 +154,28 @@ app.post("/buttons", async (req,res)=>{
         const button = new ButtonBuilder()
             .setCustomId(`dynbtn_${Date.now()}_${Math.floor(Math.random()*1000)}`)
             .setLabel(label)
-            .setStyle(styleMap[style] || ButtonStyle.Primary)
-            .setEmoji(emoji || null);
+            .setStyle(styleMap[style]||ButtonStyle.Primary)
+            .setEmoji(emoji||null);
+
         row.addComponents(button);
-        client.buttonActions[button.data.custom_id] = { type: actiontype, value: actionvalue };
+        client.buttonActions[button.data.custom_id] = {type:actiontype,value:actionvalue};
         await message.edit({components:[row]});
+
+        // Save to JSON
+        const buttons = loadButtons();
+        buttons.push({nachrichtenid,label,style,actiontype,actionvalue,emoji});
+        saveButtons(buttons);
+
         res.send("Button erfolgreich hinzugefügt ✅");
     }catch(err){
-        console.error(err);
+        console.error("Button konnte nicht hinzugefügt werden:", err);
         res.status(500).send("Nachricht nicht gefunden oder keine Rechte ❌");
     }
 });
 
-// Button Interaktionen
+// ----------------------
+// Bot Interaction Handler
+// ----------------------
 client.on("interactionCreate", async interaction=>{
     if(interaction.isButton()){
         const action = client.buttonActions[interaction.customId];
@@ -139,7 +196,7 @@ client.on("interactionCreate", async interaction=>{
                 if(interaction.message.embeds.length>0){
                     const newEmbed = EmbedBuilder.from(interaction.message.embeds[0]).setColor(action.value);
                     await interaction.update({embeds:[newEmbed]});
-                } else await interaction.reply({content:"Keine Embed-Nachricht gefunden 😅",ephemeral:true});
+                }else await interaction.reply({content:"Keine Embed-Nachricht gefunden 😅",ephemeral:true});
                 break;
             case "command":
                 await interaction.reply({content:`Slash Command "${action.value}" bitte manuell ausführen`,ephemeral:true});
@@ -150,7 +207,36 @@ client.on("interactionCreate", async interaction=>{
     }
 });
 
-// Start Server & Bot
-const PORT = process.env.PORT || 4539;
+// ----------------------
+// Bot Ready & JSON Buttons Laden
+// ----------------------
+client.once('ready', async ()=>{
+    console.log(`✅ Bot online als ${client.user.tag}`);
+
+    // Buttons aus JSON laden
+    const buttons = loadButtons();
+    for(const b of buttons){
+        try{
+            const channel = await client.channels.fetch(b.channelId||GUILD_ID);
+            const message = await channel.messages.fetch(b.nachrichtenid);
+            const row = new ActionRowBuilder();
+            const button = new ButtonBuilder()
+                .setCustomId(`dynbtn_${Date.now()}_${Math.floor(Math.random()*1000)}`)
+                .setLabel(b.label)
+                .setStyle(styleMap[b.style]||ButtonStyle.Primary)
+                .setEmoji(b.emoji||null);
+            row.addComponents(button);
+            client.buttonActions[button.data.custom_id] = {type:b.actiontype,value:b.actionvalue};
+            await message.edit({components:[row]});
+        }catch(err){
+            console.log(`Nachricht ${b.nachrichtenid} im Channel ${b.channelId||GUILD_ID} nicht gefunden.`);
+        }
+    }
+});
+
+// ----------------------
+// Server starten
+// ----------------------
+const PORT = process.env.PORT||4539;
 app.listen(PORT,()=>console.log(`🌐 Dashboard läuft auf Port ${PORT}`));
 client.login(TOKEN);
