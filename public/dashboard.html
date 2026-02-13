@@ -1,14 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-  <title>Discord Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next Level Discord Dashboard</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Mein Discord Dashboard</h1>
-  <button onclick="login()">Login mit Discord</button>
-  <p>Hier kannst du Embeds und Buttons konfigurieren</p>
 
-  <script src="dashboard.js"></script>
+<header>
+  <h1>🌐 Next Level Discord Dashboard</h1>
+  <button id="login-btn">Login mit Discord</button>
+</header>
+
+<main>
+  <section id="embeds-section">
+    <h2>Embeds erstellen</h2>
+    <form id="embed-form">
+      <input type="text" id="titel" placeholder="Titel" required>
+      <textarea id="beschreibung" placeholder="Beschreibung" required></textarea>
+      <input type="text" id="farbe" placeholder="Farbe (Hex z.B. #ff0000)">
+      <input type="text" id="footer" placeholder="Footer Text">
+      <input type="text" id="bild" placeholder="Bild URL">
+      <input type="text" id="feldname" placeholder="Feld Name (optional)">
+      <input type="text" id="feldwert" placeholder="Feld Wert (optional)">
+      <button type="submit">Embed senden</button>
+    </form>
+  </section>
+
+  <section id="buttons-section">
+    <h2>Buttons erstellen</h2>
+    <form id="button-form">
+      <input type="text" id="nachrichtenid" placeholder="Nachrichten ID" required>
+      <input type="text" id="label" placeholder="Button Text" required>
+      <select id="style" required>
+        <option value="primary">Primary (Blau)</option>
+        <option value="success">Success (Grün)</option>
+        <option value="danger">Danger (Rot)</option>
+        <option value="secondary">Secondary (Grau)</option>
+      </select>
+      <select id="actiontype" required>
+        <option value="text">Text senden</option>
+        <option value="role">Rolle vergeben/entfernen</option>
+        <option value="editembed">Embed ändern</option>
+        <option value="command">Slash Command ausführen</option>
+      </select>
+      <input type="text" id="actionvalue" placeholder="Wert der Aktion (Text, Rolle, Command)">
+      <input type="text" id="emoji" placeholder="Emoji (optional)">
+      <button type="submit">Button hinzufügen</button>
+    </form>
+  </section>
+
+  <section id="info-section">
+    <h2>Status</h2>
+    <pre id="log"></pre>
+  </section>
+</main>
+
+<script src="dashboard.js"></script>
 </body>
 </html>
