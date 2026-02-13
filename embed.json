@@ -1,0 +1,11 @@
+[
+  {
+    "titel": "Willkommen auf dem Server!",
+    "beschreibung": "Hier ist ein Beispiel-Embed.\nDu kannst mehrere Zeilen nutzen!",
+    "farbe": "#00ff00",
+    "footer": "Dein Bot",
+    "bild": "",
+    "feldName": "Info",
+    "feldWert": "Dieses Feld ist optional"
+  }
+]
