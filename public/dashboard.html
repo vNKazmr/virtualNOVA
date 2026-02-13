@@ -5,65 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Next Level Discord Dashboard</title>
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/jscolor@2.4.6/jscolor.min.js"></script>
 </head>
 <body>
-
 <header>
-  <h1>🌐 Next Level Discord Dashboard</h1>
-  <button id="login-btn">Login mit Discord</button>
+    <h1>Next Level Discord Dashboard</h1>
+    <a href="/auth/discord" class="login-btn">Mit Discord verbinden</a>
 </header>
-
 <main>
-  <section id="embeds-section" class="card">
-    <h2>Embed erstellen</h2>
-    <form id="embed-form">
-      <input type="text" id="titel" placeholder="Titel" required>
-      <textarea id="beschreibung" placeholder="Beschreibung" required></textarea>
-
-      <label for="farbe">Farbe wählen:</label>
-      <input type="color" id="farbe" value="#0099ff">
-
-      <input type="text" id="footer" placeholder="Footer Text">
-      <input type="text" id="bild" placeholder="Bild URL">
-
-      <label for="channel-select">Channel auswählen:</label>
-      <select id="channel-select" required></select>
-
-      <input type="text" id="feldname" placeholder="Feld Name (optional)">
-      <input type="text" id="feldwert" placeholder="Feld Wert (optional)">
-      <button type="submit">Embed senden</button>
-    </form>
-  </section>
-
-  <section id="buttons-section" class="card">
-    <h2>Button erstellen</h2>
-    <form id="button-form">
-      <input type="text" id="nachrichtenid" placeholder="Nachrichten ID" required>
-      <input type="text" id="label" placeholder="Button Text" required>
-      <select id="style" required>
-        <option value="primary">Primary (Blau)</option>
-        <option value="success">Success (Grün)</option>
-        <option value="danger">Danger (Rot)</option>
-        <option value="secondary">Secondary (Grau)</option>
-      </select>
-      <select id="actiontype" required>
-        <option value="text">Text senden</option>
-        <option value="role">Rolle vergeben/entfernen</option>
-        <option value="editembed">Embed ändern</option>
-        <option value="command">Slash Command ausführen</option>
-      </select>
-      <input type="text" id="actionvalue" placeholder="Wert der Aktion (Text, Rolle, Command)">
-      <input type="text" id="emoji" placeholder="Emoji (optional)">
-      <button type="submit">Button hinzufügen</button>
-    </form>
-  </section>
-
-  <section id="info-section" class="card">
-    <h2>Status</h2>
-    <pre id="log"></pre>
-  </section>
+    <section class="embed-form">
+        <h2>Neuen Embed senden</h2>
+        <form id="embedForm">
+            <input type="text" name="titel" placeholder="Titel" required>
+            <textarea name="beschreibung" placeholder="Beschreibung\nmit Zeilenumbrüchen" required></textarea>
+            <input class="jscolor" name="farbe" placeholder="Farbe (Hex)" value="0099ff">
+            <input type="text" name="footer" placeholder="Footer Text">
+            <input type="text" name="bild" placeholder="Bild URL">
+            <select id="channelSelect" name="channelId" required></select>
+            <button type="submit">Embed senden</button>
+        </form>
+        <div id="embedResult"></div>
+    </section>
 </main>
-
 <script src="dashboard.js"></script>
 </body>
 </html>
