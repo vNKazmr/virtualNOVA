@@ -11,7 +11,6 @@ if(params.has('username')){
   userInfo.innerHTML = `Angemeldet als <strong>${params.get('username')}#${params.get('discriminator')}</strong>`;
 }
 
-// Channels laden
 async function loadChannels(){
   try{
     const res = await fetch('/channels');
@@ -27,7 +26,6 @@ async function loadChannels(){
 }
 loadChannels();
 
-// Live Vorschau
 function updatePreview(){
   const titel = document.getElementById('titel').value;
   const beschreibung = document.getElementById('beschreibung').value;
@@ -35,7 +33,6 @@ function updatePreview(){
 }
 document.querySelectorAll('#titel,#beschreibung').forEach(el=>el.addEventListener('input',updatePreview));
 
-// Embed senden
 embedForm.addEventListener('submit',async e=>{
   e.preventDefault();
   const payload = {
