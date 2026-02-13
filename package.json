@@ -1,12 +1,16 @@
 {
-  "name": "ultra-dashboard",
+  "name": "discord-dashboard-bot",
   "version": "1.0.0",
+  "description": "Next Level Discord Bot + Dashboard",
   "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Kevin",
+  "license": "MIT",
   "dependencies": {
-    "discord.js": "^14.14.1",
-    "express": "^4.18.2",
+    "discord.js": "^14.14.0",
     "dotenv": "^16.3.1",
-    "express-session": "^1.17.3",
-    "node-fetch": "^2.6.7"
+    "express": "^4.18.2"
   }
 }
