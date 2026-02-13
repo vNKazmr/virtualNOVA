@@ -3,71 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Next Level Discord Dashboard</title>
+<title>Next-Level Discord Dashboard</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
-  <h1>Next Level Dashboard</h1>
-  <div id="user-info">Willkommen, <span id="username">User</span>#<span id="discriminator">0000</span></div>
+  <h1>Next-Level Dashboard</h1>
+  <div id="userInfo">Nicht eingeloggt <button id="loginBtn">Login mit Discord</button></div>
 </header>
 
 <main>
   <section class="embed-section">
-    <h2>📦 Embed erstellen</h2>
-    <form id="embed-form">
+    <h2>Embed erstellen</h2>
+    <form id="embedForm">
       <label>Titel:<input type="text" id="titel" required></label>
-      <label>Beschreibung:<textarea id="beschreibung" rows="4" placeholder="Nutze \\n für Zeilenumbruch"></textarea></label>
+      <label>Beschreibung:<textarea id="beschreibung" rows="4"></textarea></label>
       <label>Farbe:<input type="color" id="farbe" value="#0099ff"></label>
       <label>Footer:<input type="text" id="footer"></label>
-      <label>Bild URL:<input type="text" id="bild"></label>
-      <label>Feld Name:<input type="text" id="feldName"></label>
-      <label>Feld Wert:<input type="text" id="feldWert"></label>
+      <label>Bild URL:<input type="url" id="bild"></label>
+      <label>Feld Name:<input type="text" id="feldname"></label>
+      <label>Feld Wert:<input type="text" id="feldwert"></label>
       <label>Channel:
-        <select id="channel"></select>
+        <select id="channelDropdown">
+          <option value="">Lade Channels...</option>
+        </select>
       </label>
       <button type="submit">Embed senden</button>
     </form>
-    <div id="embed-preview">
-      <h3>Vorschau</h3>
-      <div id="preview-box"></div>
+  </section>
+
+  <section class="preview-section">
+    <h2>Live Vorschau</h2>
+    <div id="embedPreview">
+      <strong>Titel</strong>
+      <p>Beschreibung</p>
     </div>
   </section>
-
-  <section class="button-section">
-    <h2>🎛 Buttons hinzufügen</h2>
-    <form id="button-form">
-      <label>Nachrichten ID:<input type="text" id="msgId" required></label>
-      <label>Label:<input type="text" id="btnLabel" required></label>
-      <label>Style:
-        <select id="btnStyle">
-          <option value="primary">Primary</option>
-          <option value="success">Success</option>
-          <option value="danger">Danger</option>
-          <option value="secondary">Secondary</option>
-        </select>
-      </label>
-      <label>Aktion Typ:
-        <select id="actionType">
-          <option value="text">Text</option>
-          <option value="role">Rolle</option>
-          <option value="editembed">Embed ändern</option>
-          <option value="command">Command</option>
-        </select>
-      </label>
-      <label>Aktion Wert:<input type="text" id="actionValue" required></label>
-      <label>Emoji:<input type="text" id="emoji"></label>
-      <label>Channel:
-        <select id="btnChannel"></select>
-      </label>
-      <button type="submit">Button hinzufügen</button>
-    </form>
-  </section>
 </main>
-
-<footer>
-  <p>Next Level Dashboard &copy; 2026</p>
-</footer>
 
 <script src="script.js"></script>
 </body>
