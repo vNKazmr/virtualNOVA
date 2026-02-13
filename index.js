@@ -10,6 +10,7 @@ const {
 const express = require('express');
 const fs = require('fs');
 const fetch = require('node-fetch');
+const path = require('path');
 
 const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -25,7 +26,7 @@ const client = new Client({
     ]
 });
 
-// Memory für Buttons
+// ---------------- Memory für Buttons ----------------
 client.buttonActions = {};
 const styleMap = {
     primary: ButtonStyle.Primary,
@@ -34,30 +35,19 @@ const styleMap = {
     secondary: ButtonStyle.Secondary
 };
 
-// ----------------------
-// JSON Speicher / Loader
-// ----------------------
-function loadEmbeds(){
-    if(!fs.existsSync('./embed.json')) fs.writeFileSync('./embed.json','[]');
-    return JSON.parse(fs.readFileSync('./embed.json','utf-8'));
-}
+// ---------------- JSON Loader ----------------
+function loadEmbeds(){ if(!fs.existsSync('./embed.json')) fs.writeFileSync('./embed.json','[]'); return JSON.parse(fs.readFileSync('./embed.json','utf-8')); }
 function saveEmbeds(data){ fs.writeFileSync('./embed.json',JSON.stringify(data,null,2)); }
 
-function loadButtons(){
-    if(!fs.existsSync('./buttons.json')) fs.writeFileSync('./buttons.json','[]');
-    return JSON.parse(fs.readFileSync('./buttons.json','utf-8'));
-}
+function loadButtons(){ if(!fs.existsSync('./buttons.json')) fs.writeFileSync('./buttons.json','[]'); return JSON.parse(fs.readFileSync('./buttons.json','utf-8')); }
 function saveButtons(data){ fs.writeFileSync('./buttons.json',JSON.stringify(data,null,2)); }
 
-// ----------------------
-// Express Setup
-// ----------------------
+// ---------------- Express Setup ----------------
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 
-// ----------------------
-// OAuth2 Routes
-// ----------------------
+// ---------------- Discord OAuth2 ----------------
 app.get("/auth/discord",(req,res)=>{
     const redirectUri = encodeURIComponent(REDIRECT_URI);
     res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20guilds`);
@@ -88,24 +78,22 @@ app.get("/callback", async (req,res)=>{
             headers:{Authorization:`Bearer ${tokenData.access_token}`}
         });
         const userData = await userRes.json();
-        res.send(`Hallo ${userData.username}#${userData.discriminator}, Login erfolgreich ✅`);
+
+        // Redirect direkt zurück zum Dashboard mit User Info
+        res.redirect(`/dashboard.html?username=${encodeURIComponent(userData.username)}&discriminator=${userData.discriminator}`);
     } catch(err){
         console.error(err);
         res.send("Fehler beim OAuth2 Callback ❌");
     }
 });
 
-// ----------------------
-// Dashboard Static
-// ----------------------
+// ---------------- Static / Dashboard ----------------
 app.use(express.static('public'));
 app.get("/", (req,res)=>{
-    res.sendFile(__dirname + "/public/dashboard.html");
+    res.sendFile(path.join(__dirname,"public/dashboard.html"));
 });
 
-// ----------------------
-// Channels Endpoint
-// ----------------------
+// ---------------- Channels Endpoint ----------------
 app.get("/channels", async (req,res)=>{
     try{
         const guild = await client.guilds.fetch(GUILD_ID);
@@ -115,9 +103,7 @@ app.get("/channels", async (req,res)=>{
     }catch(err){ res.status(500).json([]); }
 });
 
-// ----------------------
-// Embed Endpoint
-// ----------------------
+// ---------------- Embed Endpoint ----------------
 app.post("/embed", async (req,res)=>{
     const { titel,beschreibung,farbe,footer,bild,feldName,feldWert,channelId } = req.body;
     try{
@@ -131,7 +117,6 @@ app.post("/embed", async (req,res)=>{
         if(feldName && feldWert) embed.addFields({name:feldName,value:feldWert});
         await channel.send({embeds:[embed]});
 
-        // Save to JSON
         const embeds = loadEmbeds();
         embeds.push({titel,beschreibung,farbe,footer,bild,feldName,feldWert,channelId});
         saveEmbeds(embeds);
@@ -143,9 +128,7 @@ app.post("/embed", async (req,res)=>{
     }
 });
 
-// ----------------------
-// Buttons Endpoint
-// ----------------------
+// ---------------- Buttons Endpoint ----------------
 app.post("/buttons", async (req,res)=>{
     const { nachrichtenid,label,style,actiontype,actionvalue,emoji } = req.body;
     try{
@@ -161,7 +144,6 @@ app.post("/buttons", async (req,res)=>{
         client.buttonActions[button.data.custom_id] = {type:actiontype,value:actionvalue};
         await message.edit({components:[row]});
 
-        // Save to JSON
         const buttons = loadButtons();
         buttons.push({nachrichtenid,label,style,actiontype,actionvalue,emoji});
         saveButtons(buttons);
@@ -173,17 +155,13 @@ app.post("/buttons", async (req,res)=>{
     }
 });
 
-// ----------------------
-// Bot Interaction Handler
-// ----------------------
+// ---------------- Interaction Handler ----------------
 client.on("interactionCreate", async interaction=>{
     if(interaction.isButton()){
         const action = client.buttonActions[interaction.customId];
         if(!action) return;
         switch(action.type){
-            case "text":
-                await interaction.reply({content:action.value,ephemeral:true});
-                break;
+            case "text": await interaction.reply({content:action.value,ephemeral:true}); break;
             case "role":
                 const role = interaction.guild.roles.cache.get(action.value);
                 if(!role) return interaction.reply({content:"Rolle nicht gefunden ❌",ephemeral:true});
@@ -196,24 +174,19 @@ client.on("interactionCreate", async interaction=>{
                 if(interaction.message.embeds.length>0){
                     const newEmbed = EmbedBuilder.from(interaction.message.embeds[0]).setColor(action.value);
                     await interaction.update({embeds:[newEmbed]});
-                }else await interaction.reply({content:"Keine Embed-Nachricht gefunden 😅",ephemeral:true});
+                } else await interaction.reply({content:"Keine Embed-Nachricht gefunden 😅",ephemeral:true});
                 break;
             case "command":
                 await interaction.reply({content:`Slash Command "${action.value}" bitte manuell ausführen`,ephemeral:true});
                 break;
-            default:
-                await interaction.reply({content:"Unbekannte Aktion ❌",ephemeral:true});
+            default: await interaction.reply({content:"Unbekannte Aktion ❌",ephemeral:true});
         }
     }
 });
 
-// ----------------------
-// Bot Ready & JSON Buttons Laden
-// ----------------------
-client.once('ready', async ()=>{
+// ---------------- Load Buttons on Startup ----------------
+client.once("ready", async ()=>{
     console.log(`✅ Bot online als ${client.user.tag}`);
-
-    // Buttons aus JSON laden
     const buttons = loadButtons();
     for(const b of buttons){
         try{
@@ -234,9 +207,7 @@ client.once('ready', async ()=>{
     }
 });
 
-// ----------------------
-// Server starten
-// ----------------------
-const PORT = process.env.PORT||4539;
+// ---------------- Start Server ----------------
+const PORT = process.env.PORT || 4539;
 app.listen(PORT,()=>console.log(`🌐 Dashboard läuft auf Port ${PORT}`));
 client.login(TOKEN);
