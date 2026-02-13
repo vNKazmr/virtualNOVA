@@ -3,31 +3,23 @@ const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
 const fs = require('fs');
-
-const { 
-  Client, 
-  GatewayIntentBits, 
-  EmbedBuilder, 
-  ActionRowBuilder, 
-  ButtonBuilder, 
-  ButtonStyle 
-} = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname,'public')));
 
-// --- Environment Variables ---
+// --- Environment ---
 const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const GUILD_ID = process.env.GUILD_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-// --- Discord Bot Setup ---
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
+// --- Discord Bot (nur erlaubte Intents!) ---
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 
-// Memory für Buttons
+// Buttons Memory
 client.buttonActions = {};
 const styleMap = {
   'primary': ButtonStyle.Primary,
@@ -38,90 +30,30 @@ const styleMap = {
 
 // --- JSON Loader/Saver ---
 function loadJSON(file){ 
-  try{ 
-    if(!fs.existsSync(file)) fs.writeFileSync(file,'[]'); 
-    return JSON.parse(fs.readFileSync(file,'utf-8')); 
-  }catch{return [];} 
+  if(!fs.existsSync(file)) fs.writeFileSync(file,'[]');
+  return JSON.parse(fs.readFileSync(file,'utf-8')); 
 }
 function saveJSON(file,data){ 
-  try{ fs.writeFileSync(file,JSON.stringify(data,null,2)); }catch(err){console.error(err);} 
+  fs.writeFileSync(file,JSON.stringify(data,null,2)); 
 }
 
-// --- Bot ready ---
+// --- Bot Ready ---
 client.once('ready', async () => {
   console.log(`Bot online als ${client.user.tag}`);
-
-  // Buttons aus buttons.json laden
-  const buttons = loadJSON('buttons.json');
-  for(const b of buttons){
-    try{
-      const channel = await client.channels.fetch(b.channelId);
-      const message = await channel.messages.fetch(b.messageId);
-      const row = new ActionRowBuilder();
-      const btn = new ButtonBuilder()
-        .setCustomId(`dynbtn_${Date.now()}_${Math.floor(Math.random()*1000)}`)
-        .setLabel(b.label)
-        .setStyle(styleMap[b.style]||ButtonStyle.Primary)
-        .setEmoji(b.emoji||null);
-      row.addComponents(btn);
-      client.buttonActions[btn.data.custom_id] = {type:b.actionType,value:b.actionValue};
-      await message.edit({components:[row]});
-    }catch(err){ console.log('Button konnte nicht hinzugefügt werden:',err);}
-  }
 });
 
-// --- Interaction Handler ---
-client.on('interactionCreate', async interaction => {
-  // Embed Commands via Bot Slash
-  if(interaction.isChatInputCommand()){
-    const embed = new EmbedBuilder()
-      .setTitle(interaction.options.getString('titel'))
-      .setDescription(interaction.options.getString('beschreibung').replace(/\\n/g,"\n"))
-      .setColor(interaction.options.getString('farbe')||'#0099ff');
-    if(interaction.options.getString('footer')) embed.setFooter({text:interaction.options.getString('footer')});
-    if(interaction.options.getString('bild')) embed.setImage(interaction.options.getString('bild'));
-    if(interaction.options.getString('feldname') && interaction.options.getString('feldwert')) embed.addFields({name:interaction.options.getString('feldname'),value:interaction.options.getString('feldwert')});
-    await interaction.reply({embeds:[embed],ephemeral:true});
-  }
+// --- Express Endpoints ---
 
-  // Button pressed
-  if(interaction.isButton()){
-    const action = client.buttonActions[interaction.customId];
-    if(!action) return;
-    switch(action.type){
-      case 'text': await interaction.reply({content:action.value,ephemeral:true}); break;
-      case 'role':
-        const role = interaction.guild.roles.cache.get(action.value);
-        if(!role) return interaction.reply({content:'Rolle nicht gefunden',ephemeral:true});
-        if(interaction.member.roles.cache.has(role.id)) interaction.member.roles.remove(role.id);
-        else interaction.member.roles.add(role.id);
-        await interaction.reply({content:`Rolle ${role.name} angepasst ✅`,ephemeral:true});
-        break;
-      case 'editembed':
-        if(interaction.message.embeds.length>0){
-          const newEmbed = EmbedBuilder.from(interaction.message.embeds[0]).setColor(action.value);
-          await interaction.update({embeds:[newEmbed]});
-        }else await interaction.reply({content:'Keine Embed Nachricht',ephemeral:true});
-        break;
-      default: await interaction.reply({content:'Unbekannte Aktion',ephemeral:true});
-    }
-  }
-});
-
-// --- Express Backend ---
-
-// Root -> Dashboard
-app.get('/', (req,res)=>{
-  res.sendFile(path.join(__dirname,'public','dashboard.html'));
-});
+// Dashboard
+app.get('/', (req,res)=>res.sendFile(path.join(__dirname,'public','dashboard.html')));
 
 // Discord Login
-app.get('/login',(req,res)=>{
+app.get('/login', (req,res)=>{
   const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds`;
   res.redirect(url);
 });
 
-// OAuth Callback
+// OAuth2 Callback
 app.get('/callback', async (req,res)=>{
   const code = req.query.code;
   if(!code) return res.send("Kein Code empfangen");
@@ -148,22 +80,21 @@ app.get('/callback', async (req,res)=>{
     });
     const userData = await userRes.json();
 
-    // Dashboard mit Username redirect
     res.redirect(`/dashboard.html?username=${encodeURIComponent(userData.username)}&discriminator=${userData.discriminator}`);
   }catch(err){ console.error(err); res.send("OAuth Fehler"); }
 });
 
-// Channels Endpoint für Dropdown
+// Channels für Dropdown
 app.get('/channels', async (req,res)=>{
   try{
     const guild = await client.guilds.fetch(GUILD_ID);
     const channels = await guild.channels.fetch();
     const textChannels = Array.from(channels.values()).filter(c=>c.isTextBased());
     res.json(textChannels.map(c=>({id:c.id,name:c.name})));
-  }catch(err){ res.json([]); }
+  }catch(err){ console.error(err); res.json([]); }
 });
 
-// Embed senden Endpoint
+// Embed senden
 app.post('/sendEmbed', async (req,res)=>{
   const {titel,beschreibung,farbe,footer,bild,feldName,feldWert,channelId} = req.body;
   try{
@@ -184,6 +115,5 @@ app.post('/sendEmbed', async (req,res)=>{
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT,()=>console.log(`Dashboard & Bot läuft auf Port ${PORT}`));
-
+app.listen(PORT,()=>console.log(`Dashboard läuft auf Port ${PORT}`));
 client.login(TOKEN);
