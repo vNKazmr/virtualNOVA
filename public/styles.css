@@ -1,95 +1,22 @@
-/* Font & Base */
-body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background: #f0f2f5;
-  color: #333;
-  margin: 0;
-  padding: 0;
+body{
+    font-family: 'Helvetica', Arial, sans-serif;
+    background: linear-gradient(135deg,#2c3e50,#4ca1af);
+    color:#fff;
+    margin:0; padding:0;
 }
-
-header {
-  background: #7289da;
-  color: #fff;
-  text-align: center;
-  padding: 20px;
+header{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px; background:rgba(0,0,0,0.4);
 }
-
-header h1 {
-  margin-bottom: 10px;
-  font-weight: 400;
+header h1{margin:0;font-size:1.8rem;}
+.login-btn{
+    background:#7289da;color:#fff;padding:10px 20px;border-radius:5px;text-decoration:none;
 }
-
-header button {
-  padding: 10px 25px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  background: #fff;
-  color: #7289da;
-  font-weight: bold;
-  transition: 0.2s;
+main{padding:20px;}
+.embed-form{
+    background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;max-width:600px;margin:auto;
 }
-
-header button:hover {
-  background: #e0e0e0;
+.embed-form input, .embed-form textarea, .embed-form select, .embed-form button{
+    width:100%;padding:10px;margin:5px 0;border-radius:5px;border:none;
 }
-
-main {
-  max-width: 1000px;
-  margin: 30px auto;
-  padding: 0 20px;
-}
-
-.card {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  margin-bottom: 25px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-.card h2 {
-  color: #7289da;
-  margin-bottom: 15px;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-input, textarea, select {
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-textarea { min-height: 70px; resize: vertical; }
-
-button[type="submit"] {
-  background: #7289da;
-  color: #fff;
-  font-weight: bold;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-button[type="submit"]:hover {
-  background: #5b6eae;
-}
-
-pre#log {
-  background: #e8e8e8;
-  border-radius: 6px;
-  padding: 15px;
-  height: 180px;
-  overflow: auto;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
+.embed-form button{background:#7289da;color:#fff;font-weight:bold;cursor:pointer;}
