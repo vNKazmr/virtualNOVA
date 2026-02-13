@@ -1,3 +1,15 @@
-body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-p { font-size: 14px; color: #333; }
+/* Basic Reset */
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+body { background: #f4f4f9; color:#333; }
+header { background:#7289da; color:white; padding:20px; text-align:center; }
+header h1 { margin-bottom:10px; }
+header button { padding:10px 20px; font-size:16px; cursor:pointer; border:none; border-radius:5px; background:#fff; color:#7289da; font-weight:bold; }
+main { max-width:900px; margin:30px auto; padding:0 20px; }
+section { background:#fff; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 3px 10px rgba(0,0,0,0.1); }
+section h2 { margin-bottom:15px; color:#7289da; }
+form { display:flex; flex-direction:column; gap:10px; }
+input, textarea, select { padding:10px; border:1px solid #ccc; border-radius:5px; font-size:14px; }
+textarea { resize:vertical; min-height:60px; }
+button[type="submit"] { background:#7289da; color:white; font-weight:bold; cursor:pointer; transition:0.2s; }
+button[type="submit"]:hover { background:#5b6eae; }
+pre#log { background:#e1e1e1; padding:10px; border-radius:5px; height:150px; overflow:auto; }
