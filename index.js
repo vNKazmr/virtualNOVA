@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- Environment Variables ---
+// --- Environment ---
 const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -50,7 +50,6 @@ app.get('/callback', async (req, res) => {
       body: params,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
-
     const tokenData = await tokenRes.json();
     if (tokenData.error) return res.send('Token Fehler: ' + tokenData.error);
 
@@ -64,7 +63,7 @@ app.get('/callback', async (req, res) => {
     });
     const guilds = await guildRes.json();
 
-    // Redirect zum Dashboard
+    // Weiterleitung zum Dashboard mit User und Guilds
     const guildParam = encodeURIComponent(JSON.stringify(guilds));
     res.redirect(`/dashboard.html?username=${encodeURIComponent(userData.username)}&discriminator=${userData.discriminator}&guilds=${guildParam}`);
   } catch (err) {
