@@ -3,7 +3,6 @@ body {
   background: #1e1e2f;
   color: #f0f0f0;
   margin: 0;
-  padding: 0;
 }
 
 header {
@@ -14,11 +13,7 @@ header {
   align-items: center;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 2rem;
-  color: #00aaff;
-}
+header h1 { color: #00aaff; }
 
 header button {
   padding: 10px 20px;
@@ -32,8 +27,8 @@ header button {
 main {
   display: flex;
   flex-wrap: wrap;
-  padding: 20px;
   gap: 20px;
+  padding: 20px;
 }
 
 section {
@@ -43,17 +38,12 @@ section {
   flex: 1 1 400px;
 }
 
-form label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-input[type=text], input[type=url], textarea, select {
+input, textarea, select {
   width: 100%;
   padding: 8px;
+  margin-top: 4px;
   border-radius: 6px;
   border: none;
-  margin-top: 4px;
   font-size: 1rem;
 }
 
@@ -64,8 +54,8 @@ button[type=submit] {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  color: #000;
   font-weight: bold;
+  color: #000;
 }
 
 #embedPreview {
@@ -76,9 +66,4 @@ button[type=submit] {
   white-space: pre-wrap;
 }
 
-#embedPreview strong {
-  display: block;
-  font-size: 1.3rem;
-  margin-bottom: 10px;
-  color: #00aaff;
-}
+#embedPreview strong { display:block; font-size:1.3rem; margin-bottom:10px; color:#00aaff; }
