@@ -14,22 +14,29 @@
 </header>
 
 <main>
-  <section id="embeds-section">
-    <h2>Embeds erstellen</h2>
+  <section id="embeds-section" class="card">
+    <h2>Embed erstellen</h2>
     <form id="embed-form">
       <input type="text" id="titel" placeholder="Titel" required>
       <textarea id="beschreibung" placeholder="Beschreibung" required></textarea>
-      <input type="text" id="farbe" placeholder="Farbe (Hex z.B. #ff0000)">
+
+      <label for="farbe">Farbe wählen:</label>
+      <input type="color" id="farbe" value="#0099ff">
+
       <input type="text" id="footer" placeholder="Footer Text">
       <input type="text" id="bild" placeholder="Bild URL">
+
+      <label for="channel-select">Channel auswählen:</label>
+      <select id="channel-select" required></select>
+
       <input type="text" id="feldname" placeholder="Feld Name (optional)">
       <input type="text" id="feldwert" placeholder="Feld Wert (optional)">
       <button type="submit">Embed senden</button>
     </form>
   </section>
 
-  <section id="buttons-section">
-    <h2>Buttons erstellen</h2>
+  <section id="buttons-section" class="card">
+    <h2>Button erstellen</h2>
     <form id="button-form">
       <input type="text" id="nachrichtenid" placeholder="Nachrichten ID" required>
       <input type="text" id="label" placeholder="Button Text" required>
@@ -51,7 +58,7 @@
     </form>
   </section>
 
-  <section id="info-section">
+  <section id="info-section" class="card">
     <h2>Status</h2>
     <pre id="log"></pre>
   </section>
