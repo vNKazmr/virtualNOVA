@@ -1,22 +1,103 @@
-body{
-    font-family: 'Helvetica', Arial, sans-serif;
-    background: linear-gradient(135deg,#2c3e50,#4ca1af);
-    color:#fff;
-    margin:0; padding:0;
+/* =======================
+   Next Level Dashboard CSS
+   ======================= */
+
+body {
+  margin:0;
+  font-family: 'Helvetica', sans-serif;
+  background: #1f1f2e;
+  color: #f0f0f0;
 }
-header{
-    display:flex; justify-content:space-between; align-items:center;
-    padding:20px; background:rgba(0,0,0,0.4);
+
+header {
+  background: linear-gradient(90deg,#4b6cb7,#182848);
+  padding: 20px;
+  text-align:center;
 }
-header h1{margin:0;font-size:1.8rem;}
-.login-btn{
-    background:#7289da;color:#fff;padding:10px 20px;border-radius:5px;text-decoration:none;
+
+header h1 {
+  margin:0;
+  font-size:2em;
+  color:#fff;
 }
-main{padding:20px;}
-.embed-form{
-    background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;max-width:600px;margin:auto;
+
+#user-info {
+  margin-top:5px;
+  font-size:1em;
+  color:#ccc;
 }
-.embed-form input, .embed-form textarea, .embed-form select, .embed-form button{
-    width:100%;padding:10px;margin:5px 0;border-radius:5px;border:none;
+
+main {
+  max-width:1200px;
+  margin:30px auto;
+  display:grid;
+  gap:30px;
+  padding:0 20px;
 }
-.embed-form button{background:#7289da;color:#fff;font-weight:bold;cursor:pointer;}
+
+section {
+  background:#2c2c3c;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.5);
+}
+
+h2 {
+  margin-top:0;
+  color:#fff;
+  border-bottom:1px solid #444;
+  padding-bottom:5px;
+}
+
+label {
+  display:block;
+  margin:10px 0;
+  font-size:1em;
+}
+
+input, textarea, select {
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+  border:none;
+  border-radius:6px;
+  background:#3b3b50;
+  color:#fff;
+}
+
+input[type="color"] {
+  padding:0;
+  height:40px;
+  width:60px;
+}
+
+button {
+  margin-top:10px;
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+  background:linear-gradient(90deg,#4b6cb7,#182848);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover {
+  background:linear-gradient(90deg,#182848,#4b6cb7);
+}
+
+#embed-preview {
+  margin-top:20px;
+  border:1px solid #555;
+  padding:15px;
+  border-radius:8px;
+  background:#1b1b2a;
+}
+
+#preview-box {
+  background:#28283d;
+  padding:15px;
+  border-radius:6px;
+  min-height:50px;
+}
