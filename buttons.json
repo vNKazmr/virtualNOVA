@@ -1,0 +1,11 @@
+[
+  {
+    "channelId": "123456789012345678",
+    "nachrichtenId": "987654321098765432",
+    "label": "Klicke mich!",
+    "emoji": "✅",
+    "style": "success",
+    "actionType": "text",
+    "actionValue": "Du hast den Button gedrückt!"
+  }
+]
