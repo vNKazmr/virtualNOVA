@@ -2,21 +2,19 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
-const fs = require('fs');
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- Environment Variables ---
+// --- Environment ---
 const TOKEN = process.env.TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
-const GUILD_ID = process.env.GUILD_ID; // optional, falls du nur eigenen Server anzeigen willst
 
-// --- Discord Bot mit erlaubten Intents ---
+// --- Discord Bot ---
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 });
@@ -25,19 +23,7 @@ client.once('ready', () => {
   console.log(`Bot online als ${client.user.tag}`);
 });
 
-// --- JSON Helper ---
-function loadJSON(file) {
-  if (!fs.existsSync(file)) fs.writeFileSync(file, '[]');
-  return JSON.parse(fs.readFileSync(file, 'utf-8'));
-}
-function saveJSON(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
-}
-
-// --- Express Routes ---
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
-
-// --- Discord OAuth Login ---
+// --- Login ---
 app.get('/login', (req, res) => {
   const scope = encodeURIComponent('identify guilds');
   const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
@@ -46,7 +32,7 @@ app.get('/login', (req, res) => {
   res.redirect(url);
 });
 
-// --- OAuth Callback ---
+// --- OAuth2 Callback ---
 app.get('/callback', async (req, res) => {
   const code = req.query.code;
   if (!code) return res.send('Fehler: Kein Code empfangen');
@@ -74,13 +60,12 @@ app.get('/callback', async (req, res) => {
     });
     const userData = await userRes.json();
 
-    // Optional: guilds abrufen
     const guildRes = await fetch('https://discord.com/api/users/@me/guilds', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
     const guilds = await guildRes.json();
 
-    // Leite zum Dashboard weiter und übergebe Username + Guilds
+    // Weiterleitung zum Dashboard mit User & Guilds
     const guildParam = encodeURIComponent(JSON.stringify(guilds));
     res.redirect(`/dashboard.html?username=${encodeURIComponent(userData.username)}&discriminator=${userData.discriminator}&guilds=${guildParam}`);
   } catch (err) {
@@ -89,7 +74,7 @@ app.get('/callback', async (req, res) => {
   }
 });
 
-// --- Channels für Dropdown laden ---
+// --- Channels für Dropdown ---
 app.get('/channels/:guildId', async (req, res) => {
   try {
     const guild = await client.guilds.fetch(req.params.guildId);
