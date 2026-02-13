@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Next Level Admin Dashboard</h1>
+
+<div class="card">
+  <h2>Status</h2>
+  <button onclick="loadStatus()">Aktualisieren</button>
+  <pre id="status"></pre>
+</div>
+
+<div class="card">
+  <h2>Embed senden</h2>
+  <input id="title" placeholder="Titel"><br>
+  <textarea id="description"></textarea><br>
+  <input id="color" placeholder="#5865F2"><br>
+  <button onclick="sendEmbed()">Senden</button>
+</div>
+
+<div class="card">
+  <h2>Button erstellen</h2>
+  <input id="label" placeholder="Text"><br>
+  <select id="style">
+    <option>Primary</option>
+    <option>Secondary</option>
+    <option>Success</option>
+    <option>Danger</option>
+  </select>
+  <button onclick="sendButton()">Senden</button>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
