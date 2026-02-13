@@ -4,12 +4,8 @@ const channelDropdown = document.getElementById('channelDropdown');
 const embedPreview = document.getElementById('embedPreview');
 const userInfo = document.getElementById('userInfo');
 
-// Discord Login
-loginBtn.addEventListener('click', ()=>{
-  window.location.href = '/login';
-});
+loginBtn.addEventListener('click',()=>{ window.location.href='/login'; });
 
-// Query Parameter User anzeigen
 const params = new URLSearchParams(window.location.search);
 if(params.has('username')){
   userInfo.innerHTML = `Angemeldet als <strong>${params.get('username')}#${params.get('discriminator')}</strong>`;
@@ -20,33 +16,27 @@ async function loadChannels(){
   try{
     const res = await fetch('/channels');
     const channels = await res.json();
-    channelDropdown.innerHTML = '';
+    channelDropdown.innerHTML='';
     channels.forEach(c=>{
       const opt = document.createElement('option');
-      opt.value = c.id;
-      opt.textContent = c.name;
+      opt.value=c.id;
+      opt.textContent=c.name;
       channelDropdown.appendChild(opt);
     });
-  }catch(err){
-    console.error('Fehler Channels:',err);
-    channelDropdown.innerHTML='<option>Fehler beim Laden</option>';
-  }
+  }catch(err){ channelDropdown.innerHTML='<option>Fehler beim Laden</option>'; }
 }
 loadChannels();
 
-// Vorschau aktualisieren
+// Live Vorschau
 function updatePreview(){
   const titel = document.getElementById('titel').value;
   const beschreibung = document.getElementById('beschreibung').value;
-  embedPreview.innerHTML = `<strong>${titel}</strong><p>${beschreibung}</p>`;
+  embedPreview.innerHTML=`<strong>${titel}</strong><p>${beschreibung}</p>`;
 }
-
-document.querySelectorAll('#titel, #beschreibung').forEach(el=>{
-  el.addEventListener('input', updatePreview);
-});
+document.querySelectorAll('#titel,#beschreibung').forEach(el=>el.addEventListener('input',updatePreview));
 
 // Embed senden
-embedForm.addEventListener('submit', async e=>{
+embedForm.addEventListener('submit',async e=>{
   e.preventDefault();
   const payload = {
     titel: document.getElementById('titel').value,
@@ -62,12 +52,9 @@ embedForm.addEventListener('submit', async e=>{
     const res = await fetch('/sendEmbed',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
+      body:JSON.stringify(payload)
     });
     const data = await res.json();
     alert(data.message);
-  }catch(err){
-    console.error(err);
-    alert('Fehler beim Senden');
-  }
+  }catch(err){ console.error(err); alert('Fehler beim Senden'); }
 });
