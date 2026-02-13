@@ -1,9 +1,23 @@
-// Discord Login
 document.getElementById("login-btn").addEventListener("click", () => {
-  window.location.href = "/callback";
+  window.location.href = "/auth/discord"; // OAuth2 Login Endpoint im Backend
 });
 
-// Embed Formular
+// Channel Dropdown automatisch laden
+async function loadChannels() {
+  try {
+    const res = await fetch("/channels");
+    const channels = await res.json();
+    const select = document.getElementById("channel-select");
+    channels.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = `${c.name} (${c.type})`;
+      select.appendChild(opt);
+    });
+  } catch(err) { appendLog("Fehler beim Laden der Channels: " + err.message); }
+}
+loadChannels();
+
 document.getElementById("embed-form").addEventListener("submit", async e => {
   e.preventDefault();
   const data = {
@@ -13,21 +27,19 @@ document.getElementById("embed-form").addEventListener("submit", async e => {
     footer: document.getElementById("footer").value,
     bild: document.getElementById("bild").value,
     feldName: document.getElementById("feldname").value,
-    feldWert: document.getElementById("feldwert").value
+    feldWert: document.getElementById("feldwert").value,
+    channelId: document.getElementById("channel-select").value
   };
-  // Call your bot endpoint to send embed
   try {
     const res = await fetch("/embed", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify(data)
     });
-    const result = await res.text();
-    appendLog(result);
-  } catch(err) { appendLog("Fehler: " + err.message); }
+    appendLog(await res.text());
+  } catch(err){ appendLog("Fehler: " + err.message); }
 });
 
-// Button Formular
 document.getElementById("button-form").addEventListener("submit", async e => {
   e.preventDefault();
   const data = {
@@ -44,12 +56,11 @@ document.getElementById("button-form").addEventListener("submit", async e => {
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify(data)
     });
-    const result = await res.text();
-    appendLog(result);
-  } catch(err) { appendLog("Fehler: " + err.message); }
+    appendLog(await res.text());
+  } catch(err){ appendLog("Fehler: " + err.message); }
 });
 
-function appendLog(msg) {
+function appendLog(msg){
   const log = document.getElementById("log");
   log.textContent += msg + "\n";
   log.scrollTop = log.scrollHeight;
