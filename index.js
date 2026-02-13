@@ -16,10 +16,8 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const GUILD_ID = process.env.GUILD_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-// --- Discord Bot (nur erlaubte Intents!) ---
+// --- Discord Bot ---
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
-
-// Buttons Memory
 client.buttonActions = {};
 const styleMap = {
   'primary': ButtonStyle.Primary,
@@ -28,36 +26,26 @@ const styleMap = {
   'secondary': ButtonStyle.Secondary
 };
 
-// --- JSON Loader/Saver ---
-function loadJSON(file){ 
-  if(!fs.existsSync(file)) fs.writeFileSync(file,'[]');
-  return JSON.parse(fs.readFileSync(file,'utf-8')); 
-}
-function saveJSON(file,data){ 
-  fs.writeFileSync(file,JSON.stringify(data,null,2)); 
-}
+// --- JSON Helper ---
+function loadJSON(file){ if(!fs.existsSync(file)) fs.writeFileSync(file,'[]'); return JSON.parse(fs.readFileSync(file,'utf-8')); }
+function saveJSON(file,data){ fs.writeFileSync(file,JSON.stringify(data,null,2)); }
 
-// --- Bot Ready ---
-client.once('ready', async () => {
-  console.log(`Bot online als ${client.user.tag}`);
-});
+// --- Bot ready ---
+client.once('ready',()=>{ console.log(`Bot online als ${client.user.tag}`); });
 
 // --- Express Endpoints ---
-
-// Dashboard
 app.get('/', (req,res)=>res.sendFile(path.join(__dirname,'public','dashboard.html')));
 
-// Discord Login
-app.get('/login', (req,res)=>{
+// Login
+app.get('/login',(req,res)=>{
   const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify%20guilds`;
   res.redirect(url);
 });
 
-// OAuth2 Callback
+// OAuth Callback
 app.get('/callback', async (req,res)=>{
   const code = req.query.code;
   if(!code) return res.send("Kein Code empfangen");
-
   try{
     const params = new URLSearchParams();
     params.append("client_id",CLIENT_ID);
